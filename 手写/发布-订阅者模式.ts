@@ -3,13 +3,13 @@ class Observe {
     constructor() {
         this.message = {};
     }
-    $on(type:string, callback):void {
+    $on(type:string, callback:Function):void {
         if (!this.message[type]) {
             this.message[type] = [];
         }
         this.message[type].push(callback)
     }
-    $off(type:string, callback):void {
+    $off(type:string, callback:Function):void {
         if (!callback)
             delete this.message[type];
         else

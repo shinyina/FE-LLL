@@ -1,0 +1,12 @@
+<script>
+    function re(){
+        console.log('re函数this=>',this);
+        return function(){
+            console.log('this=>',this);
+        }
+    }
+    let obj={
+        a:0,
+        func:re()
+    }
+</script>
