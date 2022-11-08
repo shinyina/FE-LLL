@@ -1,61 +1,52 @@
 class Commitment {
-    static PENDING = '待定'; static FULFILLED = '成功'; static REJECTED = '失败';
+    static PENDING = 'PENDING'; FULFILLED = 'FULFILLED'; REJECTED = 'REJECTED'
     constructor(func) {
-        this.resolveCallBack = [];
-        this.rejectCallBack = [];
-        this.status = Commitment.PENDING;
-        this.reslut = null;
+        this.state = Commitment.PENDING
+        this.resolveCallBack = []
+        this.rejectCallBack = []
         try {
-            func(this.resolve, this.reject);
+            func(this.resolve, this.reject)
         } catch (error) {
             this.reject(error)
         }
-
     }
-    resolve = (reslut) => {
-        if (this.status === Commitment.PENDING) {
+    resolve = (result) => {
+        if (this.state == Commitment.PENDING) {
             setTimeout(() => {
-                this.status = Commitment.FULFILLED;
-                this.reslut = reslut;
-                for(let i=0;i<this.resolveCallBack.length;i++){
-                    this.resolveCallBack[i](reslut);
-                }//等量代换
+                this.state = Commitment.FULFILLED
+                this.result = result
+                this.resolveCallBack.forEach(fn=>fn(this.result))
             })
         }
     }
-    reject = (reslut) => {
-        if (this.status === Commitment.PENDING) {
+    reject = (result) => {
+        if (this.state == Commitment.PENDING) {
             setTimeout(() => {
-                this.status = Commitment.REJECTED;
-                this.reslut = reslut;
-                this.rejectCallBack.forEach(callback => {
-                    callback(reslut);
-                })
+                this.state = Commitment.REJECTED
+                this.result = result
+                this.rejectCallBack.forEach(fn=>fn(this.result))
             })
         }
     }
-    then(onFULFILLED, onREJECTED) {
-        onFULFILLED = typeof (onFULFILLED) === 'function' ? onFULFILLED : () => { };
-        onREJECTED = typeof (onREJECTED) === 'function' ? onREJECTED : () => { };
-        if (this.status === Commitment.PENDING) {
-            this.resolveCallBack.push(onFULFILLED)
-            this.rejectCallBack.push(onREJECTED)
+    then(onResolve, onReject) {
+        typeof onResolve == 'function' ? onResolve : () => { }
+        typeof onReject == 'function' ? onReject : () => { }
+        if (this.state == Commitment.PENDING) {
+            this.rejectCallBack.push(onReject)
+            this.resolveCallBack.push(onResolve)
         }
-        if (this.status === Commitment.FULFILLED) {
-            setTimeout(() => {
-                onFULFILLED(this.reslut)
-            })
-        }
-        if (this.status === Commitment.REJECTED) {
-            setTimeout(() => {
-                onREJECTED(this.reslut)
-            })
-        }
+        else if (this.state == Commitment.FULFILLED)
+            setTimeout(onResolve(this.result))
+        else if (this.state == Commitment.REJECTED)
+            setTimeout(onReject(this.result))
     }
 }
+
 let p = new Commitment((resolve, reject) => {
-    setTimeout(()=>{
-        resolve('111')
-        console.log('000');
-    })
-}).then(res => { console.log(res); }, err => { console.error(err); })
+    console.log('000');
+    // resolve(111)
+    setTimeout(() => { resolve('111') }, 2000)
+})
+
+p.then(res => { console.log(res); console.log(333) }, () => { })
+p.then(() => { setTimeout(() => { console.log(666) }, 700); console.log(888); }, () => { })

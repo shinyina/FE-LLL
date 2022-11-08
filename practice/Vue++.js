@@ -12,6 +12,7 @@ function Observer(obj) {
         var value = obj[key]
         Object.defineProperty(obj, key, {
             get() {
+                console.log('get');
                 if (Dependency.temp)
                     dependency.addSub(Dependency.temp)
                 return value

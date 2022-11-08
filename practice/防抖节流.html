@@ -1,37 +1,54 @@
 <body>
-    <button>付款</button>
-    <script>
-    	// 获取button按钮元素
-        const btn = document.querySelector("button");
-        // 定义付款操作函数
-        function payMoney(e) {
-            console.log(this);
-            console.log(e);
-        	console.log("付款成功");
-        }
-        // 定义防抖函数
-        // func: 点击按钮要执行的函数
-        // delay: 防抖时间
-        function debounce(func, delay) {
-        	// 设置定时器标识
-        	let timer;
-        	// 难点返回事件绑定函数
-        	return function(...args) {
-        		// func指定this 该this指向元素(element)
-        		let context = this;
-        		// func参数
-        		// let args = arguments;
-        		// 先清除定时器
-        		clearTimeout(timer);
-        		//设置定时器
-        		timer = setTimeout(() => {
-        			// 调用函数
-        			// func.apply(context, args);
-                    func.apply(this,args)
-        		}, delay);
-        	}
-        }
+	<button>付款</button>
+	<script>
+		// 获取button按钮元素
+		const btn = document.querySelector("button");
+		// 定义付款操作函数
+		function payMoney(e) {
+			console.log("付款成功");
+		}
+		// 定义防抖函数
+		// func: 点击按钮要执行的函数
+		// delay: 防抖时间
+		function debounce(func, delay) {
+			// 设置定时器标识
+			let timer;
+			// 难点返回事件绑定函数
+			return function (...args) {
+				// func指定this 该this指向元素(element)
+				let context = this;
+				// func参数
+				// let args = arguments;
+				// 先清除定时器
+				clearTimeout(timer);
+				//设置定时器
+				timer = setTimeout(() => {
+					// 调用函数
+					// func.apply(context, args);
+					func.call(this, args)
+				}, delay);
+			}
+		}
+		function fangdou(fn, delay) {
+			let timer
+			return function (...args) {
+				if (timer)
+					clearTimeout(timer)
+				timer = setTimeout(() => {
+					fn.apply(this, args)
+				}, delay)
+			}
+		}
+		function jieliu(fn, delay) {
+			let previous = 0
+			return function (...args) {
+				if (Date.now() - delay > previous) {
+					fn.apply(this, args)
+					previous = Date.now()
+				}
+			}
+		}
 		// 绑定点击事件
-		btn.addEventListener("click", debounce(payMoney, 1000))
-    </script>
+		btn.addEventListener("click", fangdou(payMoney, 1000))
+	</script>
 </body>

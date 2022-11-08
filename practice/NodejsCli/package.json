@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "commander": "^9.4.1",
     "esm": "^3.2.25",
     "ts-node": "^10.9.1"
   }
